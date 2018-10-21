@@ -39,3 +39,7 @@ test_map_struct.txt
 project_update.hs
 project_update_.hs
 log_file0.txt
+game_dangerous.hs
+Build_model.hs
+Game_logic.hs
+
