@@ -73,19 +73,24 @@ vec4 gamma = vec4(g, g, g, 1);
 float distanceSqr;
 vec3 lightDifference; vec3 lightDir;
 float cosAngleIncidence[6];
-float attenuation[6] = float[6](0, 0, 0, 0, 0, 0);
+float attenuation[6];
 
 for (int n = 0; n < numLights; n++)
 {
-    lightDifference = modelInWorldPosition - worldLightPositions[n];
-    distanceSqr = dot(lightDifference, lightDifference);
-    lightDir = lightDifference * inversesqrt(distanceSqr);
-    attenuation[n] = 1 / distanceSqr;
-    cosAngleIncidence[n] = abs(dot(vertNormal, lightDir));
+  lightDifference = modelInWorldPosition - worldLightPositions[n];
+  distanceSqr = dot(lightDifference, lightDifference);
+  lightDir = lightDifference * inversesqrt(distanceSqr);
+  attenuation[n] = 1 / distanceSqr;
+  cosAngleIncidence[n] = clamp(0.15, 1, dot(vertNormal, lightDir));
 }
 
-vec4 totalStaticLight = (attenuation[0] * lmap_t0[t] * cosAngleIncidence[0] * lightIntensities[0] * diffColour) + (attenuation[1] * lmap_t1[t] * cosAngleIncidence[1] * lightIntensities[1] * diffColour) + (vec4(0.1, 0.1, 0.1, 1) * diffColour);
-vec4 totalLight = totalStaticLight + (attenuation[2] * cosAngleIncidence[2] * lightIntensities[2] * diffColour) + (attenuation[3] * cosAngleIncidence[3] * lightIntensities[3] * diffColour) + (attenuation[4] * cosAngleIncidence[4] * lightIntensities[4] * diffColour) + (attenuation[5] * cosAngleIncidence[5] * lightIntensities[5] * diffColour);
+vec4 totalLight = (attenuation[0] * lmap_t0[t] * cosAngleIncidence[0] * lightIntensities[0] * diffColour) + (attenuation[1] * lmap_t1[t] * cosAngleIncidence[1] * lightIntensities[1] * diffColour);
+
+for (int n = 2; n < numLights; n++)
+{
+  totalLight = totalLight + (attenuation[n] * cosAngleIncidence[n] * lightIntensities[n] * diffColour);
+}
+
 outputColour = pow(totalLight, gamma);
 }
 
@@ -103,7 +108,6 @@ flat out vec4 lightIntensities[6];
 flat out vec3 worldLightPositions[6];
 
 uniform mat4 mod_to_world;
-uniform mat4 world_to_mod;
 uniform mat4 world_to_clip;
 uniform vec3 lmap_pos0[100];
 uniform vec3 lmap_pos1[100];
@@ -162,20 +166,25 @@ vec4 gamma = vec4(g, g, g, 1);
 float distanceSqr;
 vec3 lightDifference; vec3 lightDir;
 float cosAngleIncidence[6];
-float attenuation[6] = float[6](0, 0, 0, 0, 0, 0);
+float attenuation[6];
 
 for (int n = 0; n < numLights; n++)
 {
-    lightDifference = modelInWorldPosition - worldLightPositions[n];
-    distanceSqr = dot(lightDifference, lightDifference);
-    lightDir = lightDifference * inversesqrt(distanceSqr);
-    attenuation[n] = 1 / distanceSqr;
-    cosAngleIncidence[n] = abs(dot(vertNormal, lightDir));
+  lightDifference = modelInWorldPosition - worldLightPositions[n];
+  distanceSqr = dot(lightDifference, lightDifference);
+  lightDir = lightDifference * inversesqrt(distanceSqr);
+  attenuation[n] = 1 / distanceSqr;
+  cosAngleIncidence[n] = clamp(0.15, 1, dot(vertNormal, lightDir));
 }
 
 vec4 diffColour = texture(tex_unit0, tex_coord);
-vec4 totalStaticLight = (attenuation[0] * lmap_t0[t] * cosAngleIncidence[0] * lightIntensities[0] * diffColour) + (attenuation[1] * lmap_t1[t] * cosAngleIncidence[1] * lightIntensities[1] * diffColour);
-vec4 totalLight = totalStaticLight + (attenuation[2] * cosAngleIncidence[2] * lightIntensities[2] * diffColour) + (attenuation[3] * cosAngleIncidence[3] * lightIntensities[3] * diffColour) + (attenuation[4] * cosAngleIncidence[4] * lightIntensities[4] * diffColour) + (attenuation[5] * cosAngleIncidence[5] * lightIntensities[5] * diffColour);
+vec4 totalLight = (attenuation[0] * lmap_t0[t] * cosAngleIncidence[0] * lightIntensities[0] * diffColour) + (attenuation[1] * lmap_t1[t] * cosAngleIncidence[1] * lightIntensities[1] * diffColour);
+
+for (int n = 2; n < numLights; n++)
+{
+  totalLight = totalLight + (attenuation[n] * cosAngleIncidence[n] * lightIntensities[n] * diffColour);
+}
+
 outputColour = pow(totalLight, gamma);
 }
 
@@ -217,9 +226,12 @@ uniform int timer;
 uniform int numLights;
 
 void main() {
-float adjust; float distanceSqr;
-vec3 lightDifference; vec3 lightDir;
-float cosAngleIncidence[5]; float attenuation[5] = float[5](0, 0, 0, 0, 0);
+float adjust;
+float distanceSqr;
+vec3 lightDifference;
+vec3 lightDir;
+float cosAngleIncidence[5];
+float attenuation[5];
 if (timer > 0)
   adjust = 1;
 else
@@ -229,14 +241,20 @@ vec4 gamma = vec4(g, g, g, 1);
 
 for (int n = 0; n < numLights; n++)
 {
-    lightDifference = modelInWorldPosition - mobileLightPositions[n];
-    distanceSqr = dot(lightDifference, lightDifference);
-    lightDir = lightDifference * inversesqrt(distanceSqr);
-    attenuation[n] = 1 / distanceSqr;
-    cosAngleIncidence[n] = abs(dot(vertNormal, lightDir));
+  lightDifference = modelInWorldPosition - mobileLightPositions[n];
+  distanceSqr = dot(lightDifference, lightDifference);
+  lightDir = lightDifference * inversesqrt(distanceSqr);
+  attenuation[n] = 1 / distanceSqr;
+  cosAngleIncidence[n] = clamp(0.15, 1, dot(vertNormal, lightDir));
 }
 
-vec4 totalLight = (attenuation[0] * adjust * cosAngleIncidence[0] * mobileLightIntensities[0] * diffColour) + (attenuation[1] * cosAngleIncidence[1] * mobileLightIntensities[1] * diffColour) + (attenuation[2] * cosAngleIncidence[2] * mobileLightIntensities[2] * diffColour) + (attenuation[3] * cosAngleIncidence[3] * mobileLightIntensities[3] * diffColour) + (attenuation[4] * cosAngleIncidence[4] * mobileLightIntensities[4] * diffColour);
+vec4 totalLight = attenuation[0] * adjust * cosAngleIncidence[0] * mobileLightIntensities[0] * diffColour;
+
+for (int n = 1; n < numLights; n++)
+{
+  totalLight = totalLight + (attenuation[n] * cosAngleIncidence[n] * mobileLightIntensities[n] * diffColour);
+}
+
 outputColour = pow(totalLight, gamma);
 }
 
@@ -295,11 +313,17 @@ for (int n = 0; n < numLights; n++)
     distanceSqr = dot(lightDifference, lightDifference);
     lightDir = lightDifference * inversesqrt(distanceSqr);
     attenuation[n] = 1 / distanceSqr;
-    cosAngleIncidence[n] = abs(dot(vertNormal, lightDir));
+    cosAngleIncidence[n] = clamp(0.15, 1, dot(vertNormal, lightDir));
 }
 
 vec4 diffColour = texture(tex_unit0, tex_coord);
-vec4 totalLight = (attenuation[0] * adjust * cosAngleIncidence[0] * mobileLightIntensities[0] * diffColour) + (attenuation[1] * cosAngleIncidence[1] * mobileLightIntensities[1] * diffColour) + (attenuation[2] * cosAngleIncidence[2] * mobileLightIntensities[2] * diffColour) + (attenuation[3] * cosAngleIncidence[3] * mobileLightIntensities[3] * diffColour) + (attenuation[4] * cosAngleIncidence[4] * mobileLightIntensities[4] * diffColour);
+vec4 totalLight = attenuation[0] * adjust * cosAngleIncidence[0] * mobileLightIntensities[0] * diffColour;
+
+for (int n = 1; n < numLights; n++)
+{
+  totalLight = totalLight + (attenuation[n] * cosAngleIncidence[n] * mobileLightIntensities[n] * diffColour);
+}
+
 outputColour = pow(totalLight, gamma);
 }
 
