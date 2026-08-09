@@ -1,0 +1,103 @@
+name:                Game-Dangerous
+version:             2.2.1
+github:              "Mushy-pea/Game-Dangerous"
+license:             Custom
+author:              "Steven Tinsley"
+maintainer:          "steven.tinsley81@gmail.com"
+copyright:           "None"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Games
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/Mushy-pea/Game-Dangerous#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- matrix >= 0.3 && < 1
+- split >= 0.2 && < 1
+- StateVar >= 1.2 && < 2
+- OpenAL >= 1.7 && < 2
+- ObjectName >= 1.1 && < 2
+- bytestring >= 0.10 && < 1
+- OpenGL >= 3.0 && < 4
+- array >= 0.5 && < 1
+- OpenGLRaw >= 3.3 && < 4
+- containers >= 0.6 && < 1
+- binary >= 0.8 && < 1
+- GLURaw >= 2.0 && < 3
+- clock >= 0.8 && < 1
+- GLUT >= 2.7 && < 3
+- random >= 1.2 && < 2
+- cryptohash-sha256 >= 0.11 && < 2
+- process >= 1.6 && < 2
+- aeson >= 2.1.2.1
+- utf8-string >= 1.0.0
+
+library:
+  source-dirs: src
+
+executables:
+  Game-Dangerous-exe:
+    main:                Main.hs
+    other-modules:       []
+    source-dirs:         app
+    ghc-options:
+    - -O
+    dependencies:
+    - Game-Dangerous
+
+  ImportModel:
+    main:                ImportModel.hs
+    other-modules:       []
+    source-dirs:         app
+    ghc-options:
+    - -O
+    dependencies:
+    - Game-Dangerous
+
+  Server:
+    main:                Server.hs
+    other-modules:       []
+    source-dirs:         app
+    ghc-options:
+    - -O
+    dependencies:
+    - Game-Dangerous
+
+  Launcher:
+    main:                Launcher.hs
+    other-modules:       []
+    source-dirs:         app
+    ghc-options:
+    - -O
+    dependencies:
+    - Game-Dangerous
+
+  GPLC_TokenAnalyser:
+    main:                GPLC_TokenAnalyser.hs
+    other-modules:       []
+    source-dirs:         app
+    ghc-options:
+    - -O
+    dependencies:
+    - Game-Dangerous
+
+tests:
+  Game-Dangerous-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Game-Dangerous
+
